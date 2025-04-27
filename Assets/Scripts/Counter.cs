@@ -1,7 +1,7 @@
+using System;
 using System.Collections;
 using JetBrains.Annotations;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class Counter : MonoBehaviour
 {
@@ -9,14 +9,21 @@ public class Counter : MonoBehaviour
     [SerializeField] private int _increaseValue = 1;
 
     private bool _isIncrease;
+    private Coroutine _coroutine;
+    private WaitForSeconds _delay;
 
-    [CanBeNull] public event UnityAction ValueChanged;
+    private void Awake()
+    {
+        _delay = new WaitForSeconds(_sleepSeconds);
+    }
+
+    public event Action ValueChanged;
 
     public int Value { get; private set; }
 
     public void Toggle()
     {
-        if (_isIncrease)
+        if (_coroutine != null)
             StopCount();
         else
             StartCount();
@@ -24,28 +31,25 @@ public class Counter : MonoBehaviour
 
     private void StartCount()
     {
-        if (_isIncrease)
-            return;
-
-        _isIncrease = true;
-        StartCoroutine(IncreaseValue());
+        _coroutine = StartCoroutine(IncreasingValue());
     }
 
     private void StopCount()
     {
-        _isIncrease = false;
+        if (_coroutine != null)
+            StopCoroutine(_coroutine);
+
+        _coroutine = null;
     }
 
-    private IEnumerator IncreaseValue()
+    private IEnumerator IncreasingValue()
     {
-        WaitForSeconds wait = new(_sleepSeconds);
-
-        while (_isIncrease)
+        while (enabled)
         {
             Value += _increaseValue;
             ValueChanged?.Invoke();
 
-            yield return wait;
+            yield return _delay;
         }
     }
 }

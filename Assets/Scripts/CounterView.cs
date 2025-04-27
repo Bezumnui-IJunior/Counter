@@ -3,12 +3,11 @@ using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(TextMeshProUGUI))]
-public class DisplayCounter : MonoBehaviour
+public class CounterView : MonoBehaviour
 {
     [SerializeField] private Counter _counter;
 
     private TextMeshProUGUI _textMesh;
-    private bool _isCount;
 
     private void Awake()
     {
